@@ -20,6 +20,9 @@ client.on('error', err => console.error(err));
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('public'));
 
+// Application helpers
+const formInput = require('./helpers/formInputHelper');
+
 app.use(methodOverride((request, response) => {
   if (request.body && typeof request.body === 'object' && '_method' in request.body) {
     // look in urlencoded POST bodies and delete it
@@ -27,7 +30,7 @@ app.use(methodOverride((request, response) => {
     delete request.body._method;
     return method;
   }
-}))
+}));
 
 // Set the view engine for server-side templating
 app.set('view engine', 'ejs');
@@ -46,6 +49,7 @@ app.get('*', (request, response) => response.status(404).send('This route does n
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
 
 // HELPER FUNCTIONS
+// Models
 function Book(info) {
   let placeholderImage = 'https://i.imgur.com/J5LVHEL.jpg';
 
@@ -58,6 +62,7 @@ function Book(info) {
 }
 
 function getBooks(request, response) {
+
   let SQL = 'SELECT * FROM books;';
 
   return client.query(SQL)
@@ -71,11 +76,11 @@ function getBooks(request, response) {
     .catch(err => handleError(err, response));
 }
 
-function createSearch(request, response) {
-  let url = 'https://www.googleapis.com/books/v1/volumes?q=';
 
-  if (request.body.search[1] === 'title') { url += `+intitle:${request.body.search[0]}`; }
-  if (request.body.search[1] === 'author') { url += `+inauthor:${request.body.search[0]}`; }
+
+function createSearch(request, response) {
+  //remember to import form-input-helper
+  let url = formInput(request);
 
   superagent.get(url)
     .then(apiResponse => apiResponse.body.items.map(bookResult => new Book(bookResult.volumeInfo)))
@@ -88,6 +93,7 @@ function newSearch(request, response) {
 }
 
 function getBook(request, response) {
+
   getBookshelves()
     .then(shelves => {
       // let SQL = 'SELECT * FROM books WHERE id=$1;';
@@ -100,13 +106,13 @@ function getBook(request, response) {
 }
 
 function getBookshelves() {
-  // let SQL = 'SELECT DISTINCT bookshelf FROM books ORDER BY bookshelf;';
   let SQL = 'SELECT * FROM bookshelves ORDER BY name;';
 
   return client.query(SQL);
 }
 
 function createShelf(shelf) {
+
   let normalizedShelf = shelf.toLowerCase();
   let SQL1 = `SELECT id from bookshelves where name=$1;`;
   let values1 = [normalizedShelf];
@@ -137,7 +143,7 @@ function createBook(request, response) {
       client.query(SQL, values)
         .then(result => response.redirect(`/books/${result.rows[0].id}`))
         .catch(err => handleError(err, response));
-    })
+    });
 
 }
 
