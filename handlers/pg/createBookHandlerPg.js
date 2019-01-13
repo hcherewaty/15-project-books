@@ -1,8 +1,6 @@
 'use strict';
-const createShelf = require('./createShelfHandlerPg');
-const handleError = require('../../handlers/handleError');
 
-function createBook(request, response, client) {
+/* pg
   createShelf(request.body.bookshelf)
     .then(id => {
       let {title, author, isbn, image_url, description} = request.body;
@@ -13,6 +11,4 @@ function createBook(request, response, client) {
         .then(result => response.redirect(`/books/${result.rows[0].id}`))
         .catch(err => handleError(err, response));
     });
-}
-
-module.exports = createBook;
+*/
