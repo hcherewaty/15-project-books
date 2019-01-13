@@ -1,8 +1,9 @@
 'use strict';
 const createShelf = require('./createShelfHandlerPg');
 const handleError = require('../../handlers/handleError');
+const client = require('../../pg');
 
-function createBook(request, response, client) {
+function createBook(request, response) {
   createShelf(request.body.bookshelf)
     .then(id => {
       let {title, author, isbn, image_url, description} = request.body;

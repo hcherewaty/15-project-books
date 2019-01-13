@@ -1,8 +1,8 @@
 'use strict';
-
+const client = require('../../pg');
 // should we be passing client? original function was in scope
 // where client was already defined
-function createShelf(client, shelf){
+function createShelf(shelf){
   let normalizedShelf = shelf.toLowerCase();
   let SQL1 = `SELECT id from bookshelves where name=$1;`;
   let values1 = [normalizedShelf];

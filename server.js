@@ -4,6 +4,7 @@
 require('dotenv').config();
 const express = require('express');
 // const pg = require('pg');
+require('./pg');
 const superagent = require('superagent');
 const methodOverride = require('method-override');
 
@@ -11,7 +12,7 @@ const methodOverride = require('method-override');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database Setup
+// // Database Setup
 // const client = new pg.Client(process.env.DATABASE_URL);
 // client.connect();
 // client.on('error', err => console.error(err));
@@ -36,18 +37,20 @@ app.use(methodOverride((request, response) => {
 app.set('view engine', 'ejs');
 
 // Handlers
-let handleError = require('./handlers/handleError')
+let handleError = require('./handlers/handleError');
 let getBook = require('./handlers/pg/getBookHandlerPg');
+let getBooks = require('./handlers/pg/getBooksHandlerPg');
+// let getBookShelves = require('./handlers/pg/getBookshelvesHandlerPg');
 let createBook = require('./handlers/pg/createBookHandlerPg');
 let updateBook = require('./handlers/pg/updateBookHandlerPg');
 let deleteBook = require('./handlers/pg/deleteBookHandlerPg');
 
+
 // API Routes
-app.get('/', getBook);
+app.get('/', getBooks);
 app.post('/searches', createSearch);
 app.get('/searches/new', newSearch);
 app.get('/books/:id', getBook);
-// app.get('/', getBooks);
 app.post('/books', createBook);
 app.put('/books/:id', updateBook);
 app.delete('/books/:id', deleteBook);
@@ -55,9 +58,6 @@ app.delete('/books/:id', deleteBook);
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
-
-
-
 
 // HELPER FUNCTIONS
 // Models
@@ -72,20 +72,22 @@ function Book(info) {
   this.id = info.industryIdentifiers ? `${info.industryIdentifiers[0].identifier}` : '';
 }
 
-function getBooks(request, response) {
+// function getBooks(request, response) {
 
-  let SQL = 'SELECT * FROM books;';
+//   let SQL = 'SELECT * FROM books;';
 
-  return client.query(SQL)
-    .then(results => {
-      if(results.rows.rowCount === 0) {
-        response.render('pages/searches/new');
-      } else {
-        response.render('pages/index', {books: results.rows})
-      }
-    })
-    .catch(err => handleError(err, response));
-}
+//   return client.query(SQL)
+//     .then(results => {
+//       if(results.rows.rowCount === 0) {
+//         response.render('pages/searches/new');
+//       } else {
+//         response.render('pages/index', {books: results.rows})
+//       }
+//     })
+//     .catch(err => handleError(err, response));
+// }
+
+
 
 function createSearch(request, response) {
   //remember to import form-input-helper
@@ -100,8 +102,6 @@ function createSearch(request, response) {
 function newSearch(request, response) {
   response.render('pages/searches/new');
 }
-
-//----------------- O L D C O D E -----------------\\
 
 // function getBook(request, response) {
 

@@ -1,6 +1,7 @@
 'use strict';
 
-function handleError(error, response) {
+//NEEDS UPPDATED!!!!!JO#JO!#J
+function handleError(error, response) { //
   response.render('pages/error', {error: error});
 }
 
