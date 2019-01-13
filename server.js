@@ -3,7 +3,7 @@
 // Application Dependencies
 require('dotenv').config();
 const express = require('express');
-const pg = require('pg');
+// const pg = require('pg');
 const superagent = require('superagent');
 const methodOverride = require('method-override');
 
@@ -12,9 +12,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Database Setup
-const client = new pg.Client(process.env.DATABASE_URL);
-client.connect();
-client.on('error', err => console.error(err));
+// const client = new pg.Client(process.env.DATABASE_URL);
+// client.connect();
+// client.on('error', err => console.error(err));
 
 // Application Middleware
 app.use(express.urlencoded({extended:true}));
@@ -35,11 +35,19 @@ app.use(methodOverride((request, response) => {
 // Set the view engine for server-side templating
 app.set('view engine', 'ejs');
 
+// Handlers
+let handleError = require('./handlers/handleError')
+let getBook = require('./handlers/pg/getBookHandlerPg');
+let createBook = require('./handlers/pg/createBookHandlerPg');
+let updateBook = require('./handlers/pg/updateBookHandlerPg');
+let deleteBook = require('./handlers/pg/deleteBookHandlerPg');
+
 // API Routes
-app.get('/', getBooks);
+app.get('/', getBook);
 app.post('/searches', createSearch);
 app.get('/searches/new', newSearch);
 app.get('/books/:id', getBook);
+// app.get('/', getBooks);
 app.post('/books', createBook);
 app.put('/books/:id', updateBook);
 app.delete('/books/:id', deleteBook);
@@ -47,6 +55,9 @@ app.delete('/books/:id', deleteBook);
 app.get('*', (request, response) => response.status(404).send('This route does not exist'));
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
+
+
+
 
 // HELPER FUNCTIONS
 // Models
@@ -76,8 +87,6 @@ function getBooks(request, response) {
     .catch(err => handleError(err, response));
 }
 
-
-
 function createSearch(request, response) {
   //remember to import form-input-helper
   let url = formInput(request);
@@ -92,81 +101,83 @@ function newSearch(request, response) {
   response.render('pages/searches/new');
 }
 
-function getBook(request, response) {
+//----------------- O L D C O D E -----------------\\
 
-  getBookshelves()
-    .then(shelves => {
-      // let SQL = 'SELECT * FROM books WHERE id=$1;';
-      let SQL = 'SELECT books.*, bookshelves.name FROM books INNER JOIN bookshelves on books.bookshelf_id=bookshelves.id WHERE books.id=$1;';
-      let values = [request.params.id];
-      client.query(SQL, values)
-        .then(result => response.render('pages/books/show', {book: result.rows[0], bookshelves: shelves.rows}))
-        .catch(err => handleError(err, response));
-    })
-}
+// function getBook(request, response) {
 
-function getBookshelves() {
-  let SQL = 'SELECT * FROM bookshelves ORDER BY name;';
+//   getBookshelves()
+//     .then(shelves => {
+//       // let SQL = 'SELECT * FROM books WHERE id=$1;';
+//       let SQL = 'SELECT books.*, bookshelves.name FROM books INNER JOIN bookshelves on books.bookshelf_id=bookshelves.id WHERE books.id=$1;';
+//       let values = [request.params.id];
+//       client.query(SQL, values)
+//         .then(result => response.render('pages/books/show', {book: result.rows[0], bookshelves: shelves.rows}))
+//         .catch(err => handleError(err, response));
+//     })
+// }
 
-  return client.query(SQL);
-}
+// function getBookshelves() {
+//   let SQL = 'SELECT * FROM bookshelves ORDER BY name;';
 
-function createShelf(shelf) {
+//   return client.query(SQL);
+// }
 
-  let normalizedShelf = shelf.toLowerCase();
-  let SQL1 = `SELECT id from bookshelves where name=$1;`;
-  let values1 = [normalizedShelf];
+// function createShelf(shelf) {
 
-  return client.query(SQL1, values1)
-    .then(results => {
-      if(results.rowCount) {
-        return results.rows[0].id;
-      } else {
-        let INSERT = `INSERT INTO bookshelves(name) VALUES($1) RETURNING id;`;
-        let insertValues = [shelf];
+//   let normalizedShelf = shelf.toLowerCase();
+//   let SQL1 = `SELECT id from bookshelves where name=$1;`;
+//   let values1 = [normalizedShelf];
 
-        return client.query(INSERT, insertValues)
-          .then(results => {
-            return results.rows[0].id;
-          })
-      }
-    })
-}
+//   return client.query(SQL1, values1)
+//     .then(results => {
+//       if(results.rowCount) {
+//         return results.rows[0].id;
+//       } else {
+//         let INSERT = `INSERT INTO bookshelves(name) VALUES($1) RETURNING id;`;
+//         let insertValues = [shelf];
 
-function createBook(request, response) {
-  createShelf(request.body.bookshelf)
-    .then(id => {
-      let {title, author, isbn, image_url, description} = request.body;
-      let SQL = 'INSERT INTO books(title, author, isbn, image_url, description, bookshelf_id) VALUES($1, $2, $3, $4, $5, $6) RETURNING id;';
-      let values = [title, author, isbn, image_url, description, id];
+//         return client.query(INSERT, insertValues)
+//           .then(results => {
+//             return results.rows[0].id;
+//           })
+//       }
+//     })
+// }
 
-      client.query(SQL, values)
-        .then(result => response.redirect(`/books/${result.rows[0].id}`))
-        .catch(err => handleError(err, response));
-    });
+// function createBook(request, response) {
+//   createShelf(request.body.bookshelf)
+//     .then(id => {
+//       let {title, author, isbn, image_url, description} = request.body;
+//       let SQL = 'INSERT INTO books(title, author, isbn, image_url, description, bookshelf_id) VALUES($1, $2, $3, $4, $5, $6) RETURNING id;';
+//       let values = [title, author, isbn, image_url, description, id];
 
-}
+//       client.query(SQL, values)
+//         .then(result => response.redirect(`/books/${result.rows[0].id}`))
+//         .catch(err => handleError(err, response));
+//     });
 
-function updateBook(request, response) {
-  let {title, author, isbn, image_url, description, bookshelf_id} = request.body;
-  // let SQL = `UPDATE books SET title=$1, author=$2, isbn=$3, image_url=$4, description=$5, bookshelf=$6 WHERE id=$7;`;
-  let SQL = `UPDATE books SET title=$1, author=$2, isbn=$3, image_url=$4, description=$5, bookshelf_id=$6 WHERE id=$7;`;
-  let values = [title, author, isbn, image_url, description, bookshelf_id, request.params.id];
+// }
 
-  client.query(SQL, values)
-    .then(response.redirect(`/books/${request.params.id}`))
-    .catch(err => handleError(err, response));
-}
+// function updateBook(request, response) {
+//   let {title, author, isbn, image_url, description, bookshelf_id} = request.body;
+//   // let SQL = `UPDATE books SET title=$1, author=$2, isbn=$3, image_url=$4, description=$5, bookshelf=$6 WHERE id=$7;`;
+//   let SQL = `UPDATE books SET title=$1, author=$2, isbn=$3, image_url=$4, description=$5, bookshelf_id=$6 WHERE id=$7;`;
+//   let values = [title, author, isbn, image_url, description, bookshelf_id, request.params.id];
 
-function deleteBook(request, response) {
-  let SQL = 'DELETE FROM books WHERE id=$1;';
-  let values = [request.params.id];
+//   client.query(SQL, values)
+//     .then(response.redirect(`/books/${request.params.id}`))
+//     .catch(err => handleError(err, response));
+// }
 
-  return client.query(SQL, values)
-    .then(response.redirect('/'))
-    .catch(err => handleError(err, response));
-}
+// function deleteBook(request, response) {
+//   let SQL = 'DELETE FROM books WHERE id=$1;';
+//   let values = [request.params.id];
 
-function handleError(error, response) {
-  response.render('pages/error', {error: error});
-}
+//   return client.query(SQL, values)
+//     .then(response.redirect('/'))
+//     .catch(err => handleError(err, response));
+// }
+
+// function handleError(error, response) {
+//   response.render('pages/error', {error: error});
+// }
