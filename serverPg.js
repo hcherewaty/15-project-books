@@ -7,7 +7,7 @@ const express = require('express');
 require('./pg');
 const superagent = require('superagent');
 const methodOverride = require('method-override');
-const Book = require('./models/pg/modelPG');
+const Book = require('./models/pg/modelPg');
 
 // Application Setup
 const app = express();
@@ -43,6 +43,16 @@ let deleteBook = require('./handlers/pg/deleteBookHandlerPg');
 
 
 // API Routes
+function routes() {
+  this.getBooks = app.get('/', getBooks);
+  this. createSearch = app.post('/searches', createSearch);
+  this. newSearch = app.get('/searches/new', newSearch);
+  this.getBook = app.get('/books/:id', getBook);
+  this. createBook = app.post('/books', createBook);
+  this.updateBook = app.put('/books/:id', updateBook);
+  this.deleteBook = app.delete('/books/:id', deleteBook);
+}
+
 app.get('/', getBooks);
 app.post('/searches', createSearch);
 app.get('/searches/new', newSearch);
@@ -55,6 +65,12 @@ app.get('*', (request, response) => response.status(404).send('This route does n
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
 
+/**
+ * Searches and renders results based off user input
+ *
+ * @param {*} request
+ * @param {*} response
+ */
 function createSearch(request, response) {
   let url = formInput(request);
 
@@ -68,3 +84,4 @@ function newSearch(request, response) {
   response.render('pages/searches/new');
 }
 
+module.exports = routes;

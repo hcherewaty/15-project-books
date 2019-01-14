@@ -2,6 +2,12 @@
 const client = require('../../pg');
 // should we be passing client? original function was in scope
 // where client was already defined
+/**
+ * Handles creating a bookshelf
+ *
+ * @param {*} shelf
+ * @returns
+ */
 function createShelf(shelf){
   let normalizedShelf = shelf.toLowerCase();
   let SQL1 = `SELECT id from bookshelves where name=$1;`;

@@ -2,6 +2,12 @@
 const handleError = require('../../handlers/handleError');
 const client = require('../../pg');
 
+/**
+ * handles updating a book
+ *
+ * @param {*} request
+ * @param {*} response
+ */
 function updateBook(request, response) {
   let {title, author, isbn, image_url, description, bookshelf_id} = request.body;
   // let SQL = `UPDATE books SET title=$1, author=$2, isbn=$3, image_url=$4, description=$5, bookshelf=$6 WHERE id=$7;`;
