@@ -10,7 +10,7 @@
 
 * [repo](https://github.com/hcherewaty/15-project-books)
 * [travis](https://www.travis-ci.com/hcherewaty/15-project-books)
-* [Heroku]()
+* [Heroku](https://hc-ja-bookapp.herokuapp.com/)
 
 
 #### Documentation
@@ -34,7 +34,8 @@
 
   
 #### Tests
-* How do you run tests?
-* What assertions were made?
-* What assertions need to be / should be made?
+* npm test (runs unit tests)
+* npm run lint (runs linter tests)
+* Tests server routes
+* Tests models for PG and Mongo
 
