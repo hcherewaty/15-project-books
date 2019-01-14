@@ -3,6 +3,12 @@ const createShelf = require('./createShelfHandlerPg');
 const handleError = require('../../handlers/handleError');
 const client = require('../../pg');
 
+/**
+ * Handles adding a book to the bookshelf
+ *
+ * @param {*} request
+ * @param {*} response
+ */
 function createBook(request, response) {
   createShelf(request.body.bookshelf)
     .then(id => {

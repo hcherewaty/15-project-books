@@ -5,7 +5,8 @@
   "main": "serverPg.js",
   "scripts": {
     "start": "node serverPg.js",
-    "watch": "nodemon serverPg.js"
+    "watch": "nodemon serverPg.js",
+    "test": "jest --verbose --coverage"
   },
   "keywords": [],
   "author": "Code Fellows, LLC",
@@ -15,8 +16,13 @@
     "dotenv": "^6.2.0",
     "ejs": "^2.6.1",
     "express": "^4.16.2",
+    "jest": "^23.6.0",
     "method-override": "^3.0.0",
+    "mongodb-memory-server": "^2.9.3",
+    "mongoose": "^5.4.4",
+    "mongoose-schema-jsonschema": "^1.2.1",
     "pg": "^7.3.0",
-    "superagent": "^3.8.3"
+    "superagent": "^3.8.3",
+    "supertest": "^3.3.0"
   }
 }

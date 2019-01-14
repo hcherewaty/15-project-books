@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * helper function used to gather form input
+ *
+ * @param {*} request
+ * @returns
+ */
 function formInput(request) {
   let url = 'https://www.googleapis.com/books/v1/volumes?q=';
   if (request.body.search[1] === 'title') { url += `+intitle:${request.body.search[0]}`; }

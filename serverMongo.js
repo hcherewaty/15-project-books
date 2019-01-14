@@ -45,6 +45,13 @@ app.get('*', (request, response) => response.status(404).send('This route does n
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
 
+/**
+ * gets all books
+ *
+ * @param {*} request
+ * @param {*} response
+ * @returns
+ */
 function getBooks(request, response) {
     let mongo = getBookShelves();
     return client.query(mongo)
@@ -58,6 +65,13 @@ function getBooks(request, response) {
     .catch(err => handleError(err, response));
 }
 
+/**
+ * gets a book
+ *
+ * @param {*} request
+ * @param {*} response
+ * @returns
+ */
 function getBook(request, response) {
     let mongo = books.get(request.params.id)
     return client.query(mongo)
@@ -65,6 +79,13 @@ function getBook(request, response) {
     .catch(err => handleError(err, response));
 }
 
+/**
+ * adds a book to mongo
+ *
+ * @param {*} request
+ * @param {*} response
+ * @returns
+ */
 function createBook(request, response) {
     let mongo = books.post(request.body);
     return client.query(mongo)
@@ -72,6 +93,13 @@ function createBook(request, response) {
     .catch(err => handleError(err, response));
 }
 
+/**
+ * updates a book in mongo
+ *
+ * @param {*} request
+ * @param {*} response
+ * @returns
+ */
 function updateBook(request, response) {
     let mongo = books.put(request.body);
     return client.query(mongo)
@@ -79,17 +107,37 @@ function updateBook(request, response) {
     .catch(err => handleError(err, response));
 }
 
+/**
+ * deletes a book from mongodb
+ *
+ * @param {*} request
+ * @param {*} response
+ * @returns
+ */
 function deleteBook(request, response) {
     let mongo = books.delete(request.params.id);
     return response.redirect('/')
     .catch(err => handleError(err, response));
 }
 
+/**
+ * get books from bookshelves 
+ *
+ * @param {*} request
+ * @param {*} response
+ * @returns
+ */
 function getBookShelves(request, response) {
     let mongo = books.find();
     return client.query(mongo);
 }
 
+/**
+ * searches based on user input
+ *
+ * @param {*} request
+ * @param {*} response
+ */
 function createSearch(request, response) {
   let url = formInput(request);
 
@@ -99,6 +147,12 @@ function createSearch(request, response) {
     .catch(err => handleError(err, response));
 }
 
+/**
+ * rendres new search page
+ *
+ * @param {*} request
+ * @param {*} response
+ */
 function newSearch(request, response) {
   response.render('pages/searches/new');
 }
